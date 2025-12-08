@@ -1,3 +1,4 @@
+import { checkNavigationSequence } from "./sequenceBasedAnomaly";
 import { checkSlidingWindowAttack } from "./slidingWindowDetection";
 
 export const detection = async (counts, bufferSnapshot) => {
@@ -13,7 +14,7 @@ export const detection = async (counts, bufferSnapshot) => {
         
         if (action === 'LOGIN_FAILURE') {
             let flagged = false;
-
+            
             if(count > threshold) {
                 console.log(`   FLAGGED: ${ip} (${count} > ${threshold})`);
                 flagged = true;
@@ -36,6 +37,21 @@ export const detection = async (counts, bufferSnapshot) => {
 
     for (const item of bufferSnapshot) {
         const ip = item.meta?.ip;
+        const userId = item.meta?.userId;
+        const path = item.meta?.path;
+
+        let sequenceAnomaly = false;
+
+        if(userId && path) {
+            const seqResult = await checkNavigationSequence(userId, path);
+
+            if(seqResult.anomaly) {
+                console.log(`   SEQUENCE FLAGGED: ${seqResult.msg}`);
+                sequenceAnomaly = true;
+                attackIps.add(ip);
+            }
+        }
+
         if (ip && attackIps.has(ip)) {
             item.isAttack = true;
             item.level = 'CRITICAL';

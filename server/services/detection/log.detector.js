@@ -1,4 +1,6 @@
-export const detection = (counts, bufferSnapshot) => {
+import { checkSlidingWindowAttack } from "./slidingWindowDetection";
+
+export const detection = async (counts, bufferSnapshot) => {
     console.log("Running detection...");
     let attackIps = new Set();
 
@@ -9,9 +11,26 @@ export const detection = (counts, bufferSnapshot) => {
         const [ip, action] = key.split('#');
         console.log(`   ${ip}: ${count} ${action}`);
         
-        if (action === 'LOGIN_FAILURE' && count > threshold) {
-            console.log(`   FLAGGED: ${ip} (${count} > ${threshold})`);
-            attackIps.add(ip);
+        if (action === 'LOGIN_FAILURE') {
+            let flagged = false;
+
+            if(count > threshold) {
+                console.log(`   FLAGGED: ${ip} (${count} > ${threshold})`);
+                flagged = true;
+            }
+
+            const item = bufferSnapshot.find(log => log.meta?.ip === ip && log.action === 'LOGIN_FAILURE');
+            if(item) {
+                const result = await checkSlidingWindowAttack(ip, item.timestamp);
+                if(result.anomaly) {
+                    console.log(`   FLAGGED (SLIDING WINDOW): ${ip} - count=${result.count}`);
+                    flagged = true;
+                }
+            }
+
+            if(flagged) {
+                attackIps.add(ip);
+            }
         }
     }
 

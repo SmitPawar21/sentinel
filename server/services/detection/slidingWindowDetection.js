@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-const redis = Redis();
+const redis = new Redis();
 
 const WINDOW_SIZE_SECONDS = 60;
 const FAILURE_THRESHOLD = 10;

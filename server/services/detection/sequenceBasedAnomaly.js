@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-const redis = Redis();
+const redis = new Redis();
 
 const validTransitions = {
     '/login': ['/dashboard', '/profile'],

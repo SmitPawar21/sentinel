@@ -47,6 +47,7 @@ export const detection = async (counts, bufferSnapshot) => {
     }
 
     for (const item of bufferSnapshot) {
+        item.attackReasons = [];
         const ip = item.meta?.ip;
         const userId = item.meta?.userId;
         const path = item.meta?.path;

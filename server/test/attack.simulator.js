@@ -14,7 +14,7 @@ const sendGoodRequests = async (count) => {
             limit(() => {
                 axios.post(`${API_URL}/logs/`, {
                     timestamp: new Date(),
-                    serviceName: "AuthService",
+                    serviceName: "ProductService",
                     level: "INFO",
                     message: "Page viewed successfully",
                     action: "PAGE_VIEW",
@@ -40,7 +40,7 @@ const sendAttackRequests = async (count) => {
             limit(() => {
                 axios.post(`${API_URL}/logs/`, {
                     timestamp: new Date(),
-                    serviceName: "AuthService",
+                    serviceName: "ProductService",
                     level: "ERROR",
                     message: "User login failed",
                     action: "LOGIN_FAILURE",
@@ -89,10 +89,10 @@ function randomPath() {
 
 const runTest = async () => {
     console.log("Starting test...");
-    await sendGoodRequests(1000);
+    await sendGoodRequests(100);
 
     console.log("Sending attack requests from single IP...");
-    await sendAttackRequests(500);
+    await sendAttackRequests(50);
 
     console.log("Waiting for flush...");
     await new Promise((res) => setTimeout(res, 10000));

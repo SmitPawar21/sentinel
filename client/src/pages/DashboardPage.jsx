@@ -16,7 +16,15 @@ export default function Dashboard() {
   const fetchStats = async () => {
     try {
       const res = await axios.get(`${API}/logs/stats`);
-      setStats(res.data);
+      setStats({
+        totalLogs: 0,
+        totalAttacks: 0,
+        attacksPerMinute: res.data.attacksPerMinResult[0].count,
+        avgResponseTime: 0,
+        topServices: res.data.topServicesResult,
+        errorBreakdown: {},
+      });
+      console.log(res.data)
     } catch (err) {
       console.error("Error fetching dashboard:", err);
     }
@@ -51,7 +59,7 @@ export default function Dashboard() {
             <ul className="list-disc pl-6">
               {stats.topServices.map((svc, i) => (
                 <li key={i}>
-                  {svc.service}: <span className="font-semibold">{svc.count}</span>
+                  {svc._id}: <span className="font-semibold">{svc.count} entries</span>
                 </li>
               ))}
             </ul>

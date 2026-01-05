@@ -1,24 +1,31 @@
 import axios from "axios";
+import pLimit from "p-limit";
 
 const API_URL = "http://localhost:3000";
+
+
+const limit = pLimit(50);
+// This means atmost 50 promises wil run simultaneously
 
 const sendGoodRequests = async (count) => {
     const promises = [];
     for (let i = 0; i < count; i++) {
         promises.push(
-            axios.post(`${API_URL}/logs/`, {
-                timestamp: new Date(),
-                serviceName: "AuthService",
-                level: "INFO",
-                message: "Page viewed successfully",
-                action: "PAGE_VIEW",
-                meta: {
-                    userId: `user_${Math.floor(Math.random() * 10)}`,   
-                    path: randomPath(),                                 
-                    ip: `192.168.1.${Math.floor(Math.random() * 200)}`,
-                    responseTime: Math.floor(Math.random() * 200),
-                }
-            }).catch((e) => console.log(e.message))
+            limit(() => {
+                axios.post(`${API_URL}/logs/`, {
+                    timestamp: new Date(),
+                    serviceName: "AuthService",
+                    level: "INFO",
+                    message: "Page viewed successfully",
+                    action: "PAGE_VIEW",
+                    meta: {
+                        userId: `user_${Math.floor(Math.random() * 10)}`,   
+                        path: '/login',                                 
+                        ip: `192.168.1.${Math.floor(Math.random() * 200)}`,
+                        responseTime: Math.floor(Math.random() * 200),
+                    }
+                }).catch((e) => console.log(e.message))
+            })
         );
     }
 await Promise.all(promises);
@@ -30,19 +37,21 @@ const sendAttackRequests = async (count) => {
     const promises = [];
     for (let i = 0; i < count; i++) {
         promises.push(
-            axios.post(`${API_URL}/logs/`, {
-                timestamp: new Date(),
-                serviceName: "AuthService",
-                level: "ERROR",
-                message: "User login failed",
-                action: "LOGIN_FAILURE",
-                meta: {
-                    userId: `user_${Math.floor(Math.random() * 10)}`,   
-                    path: randomPath(),                                 
-                    ip: attackIP,
-                    responseTime: Math.floor(Math.random() * 500),
-                }
-            }).catch((e) => console.log(e.message))
+            limit(() => {
+                axios.post(`${API_URL}/logs/`, {
+                    timestamp: new Date(),
+                    serviceName: "AuthService",
+                    level: "ERROR",
+                    message: "User login failed",
+                    action: "LOGIN_FAILURE",
+                    meta: {
+                        userId: `user_${Math.floor(Math.random() * 10)}`,   
+                        path: randomPath(),                                 
+                        ip: attackIP,
+                        responseTime: Math.floor(Math.random() * 500),
+                    }
+                }).catch((e) => console.log(e))
+            })
         );
     }
     await Promise.all(promises);

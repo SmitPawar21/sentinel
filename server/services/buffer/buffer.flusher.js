@@ -38,7 +38,7 @@ export const flushBuffer = async () => {
         const counts = buildCounts(bufferSnapshot);
         console.log("Counts:", counts);
         
-        const attackIps = detection(counts, bufferSnapshot);
+        const attackIps = await detection(counts, bufferSnapshot);
         console.log("Attack IPs found:", [...attackIps]);
         
         await logEntry.insertMany(bufferSnapshot, { ordered: false });

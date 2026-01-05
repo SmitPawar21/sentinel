@@ -9,20 +9,30 @@ const validTransitions = {
     '/checkout': ['/payment-success'],
 };
 
+const validStartPaths = ['/login', '/dashboard', '/products', '/cart', 'checkout'];
+
 export const checkNavigationSequence = async (userId, path) => {
     const key = `user_path:${userId}`;
     const lastPath = await redis.get(key);
 
     await redis.setex(key, 3600, path);
 
-    if(!lastPath) return {anomaly:false}
+    if(!lastPath) {
+        if(validStartPaths.includes(path)) {
+            return {anomaly:false}
+        }
+    }
+
+    if(lastPath == path) {
+        return {anomaly:false}
+    }
 
     const allowedNext = validTransitions[lastPath] || [];
 
     if(!allowedNext.includes(path)) {
         return {
             anomaly: true,
-            msg: `Illegal Sequence: Jumped from ${lastPath} to ${currentPath}`
+            msg: `Illegal Sequence: Jumped from ${lastPath} to ${path}`
         }
     } 
 

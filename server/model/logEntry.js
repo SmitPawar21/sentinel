@@ -39,6 +39,11 @@ const LogEntrySchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    attackReasons: {
+      type: Array,
+      default: []
+    }
   },
   {
     collection: "LogEntries", 

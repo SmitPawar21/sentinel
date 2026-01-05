@@ -1,5 +1,5 @@
-import { checkNavigationSequence } from "./sequenceBasedAnomaly";
-import { checkSlidingWindowAttack } from "./slidingWindowDetection";
+import { checkNavigationSequence } from "./sequenceBasedAnomaly.js";
+import { checkSlidingWindowAttack } from "./slidingWindowDetection.js";
 
 export const detection = async (counts, bufferSnapshot) => {
     console.log("Running detection...");
